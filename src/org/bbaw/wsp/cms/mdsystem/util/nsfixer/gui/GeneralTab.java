@@ -62,7 +62,10 @@ public class GeneralTab extends Observable {
   }
 
   private void setMainLayout() {
-    mainPanel.setLayout(new BorderLayout());
+    final BorderLayout borderLayout = new BorderLayout();
+    mainPanel.setLayout(borderLayout);
+    borderLayout.setVgap(15); // vertical distance between components
+    borderLayout.setHgap(15); // horicontal distance between components
   }
 
   /**

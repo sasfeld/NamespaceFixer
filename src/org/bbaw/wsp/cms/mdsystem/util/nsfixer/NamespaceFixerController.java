@@ -28,18 +28,20 @@ import org.bbaw.wsp.cms.mdsystem.util.nsfixer.gui.SelectionRecord;
 public class NamespaceFixerController implements Observer {
   public static final String SAVE_DIR_NAME = "wsp_namespace_fixer";
 
-  public class GuiCloseListener extends WindowAdapter {
-
+  /**
+   * Listener class of the controller who reacts on the UI's window changes.
+   * 
+   * @author <a href="mailto:wsp-shk1@bbaw.de">Sascha Feldmann</a>
+   * @since 21.03.2013
+   * 
+   */
+  public class GuiWindowListener extends WindowAdapter {
     @Override
-    public void windowOpened(final WindowEvent event) {
-      final File targetDir = getTargetDir();
-      final SelectionRecord loadedSelection = GuiUtils.loadSettings(targetDir);
-      if (loadedSelection != null) {
-        FixerGui.setCurrentSelection(loadedSelection);
-      }
-    }
-
-    @Override
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.awt.event.WindowAdapter#windowClosing(java.awt.event.WindowEvent)
+     */
     public void windowClosing(final WindowEvent event) {
       if (FixerGui.getCurrentSelection().selectionPerformed()) {
         final File targetDir = getTargetDir();
@@ -47,6 +49,11 @@ public class NamespaceFixerController implements Observer {
       }
     }
 
+    /**
+     * Get the target dir where the save file is saved.
+     * 
+     * @return
+     */
     private File getTargetDir() {
       final File f = new File(System.getProperty("user.home"), SAVE_DIR_NAME);
       if (!f.exists()) {
@@ -67,7 +74,7 @@ public class NamespaceFixerController implements Observer {
     namespaceFixer = new NamespaceFixer();
     namespaceFixer.addObserver(this);
     gui = FixerGui.getInstance();
-    gui.addWindowListener(new GuiCloseListener());
+    gui.addWindowListener(new GuiWindowListener());
     gui.setVisible(true);
     gui.addObserver(this);
   }
@@ -86,7 +93,7 @@ public class NamespaceFixerController implements Observer {
         if (selection.getInputFile().isDirectory()) {
           namespaceFixer.fixDir(selection.getInputFile(), selection.getOutputFile(), forceOverride);
         } else {
-          namespaceFixer.fixFile(selection.getInputFile(), selection.getOutputFile());
+          namespaceFixer.fixFile(selection.getInputFile(), selection.getOutputFile(), false);
         }
       }
     } catch (final InvalidSelectionException e) {
@@ -94,11 +101,16 @@ public class NamespaceFixerController implements Observer {
     } catch (final NeedToOverrideException e) {
       final boolean force = gui.showConfirmDialog(e);
       if (force) {
-        namespaceFixer.skipTo(e.getInputFile());
         try {
-          namespaceFixer.fixFile(e.getInputFile(), e.getOutputFile());
-          startFixing(selection, false);
-        } catch (final InvalidSelectionException e1) {
+          if (e.isDir()) { // override single file and restart directory scanning
+            namespaceFixer.skipTo(e.getInputFile());
+
+            namespaceFixer.fixFile(e.getInputFile(), e.getOutputFile(), true);
+            startFixing(selection, false);
+          } else { // override single file
+            namespaceFixer.fixFile(e.getInputFile(), e.getOutputFile(), true);
+          }
+        } catch (final InvalidSelectionException | NeedToOverrideException e1) {
           // TODO Auto-generated catch block
           e1.printStackTrace();
         }
@@ -115,7 +127,6 @@ public class NamespaceFixerController implements Observer {
   public void update(final Observable o, final Object transmittedObject) {
     if (transmittedObject instanceof SelectionRecord) { // information by the FixTab
       final SelectionRecord selection = (SelectionRecord) transmittedObject;
-      System.out.println("starting fixing");
       startFixing(selection, false);
     } else if (transmittedObject instanceof String) { // information by the NamespaceFixer
       gui.addToLog((String) transmittedObject);

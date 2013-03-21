@@ -5,6 +5,7 @@
 
 package org.bbaw.wsp.cms.mdsystem.util.nsfixer.gui;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -51,6 +52,8 @@ public class OutputTab extends GeneralTab {
       initializeLabel = "Currently selected: " + currentSelection.getOutputFile();
     }
     aktSelectionLabel = new JLabel(initializeLabel);
+    final Color textFieldColor = Color.BLUE;
+    aktSelectionLabel.setForeground(textFieldColor);
     super.components.add(aktSelectionLabel);
 
     specifyFileBtn = new JButton(FILE_BUTTON_LABEL);

@@ -5,6 +5,7 @@
 
 package org.bbaw.wsp.cms.mdsystem.util.nsfixer.gui;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -12,6 +13,7 @@ import java.io.File;
 import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JTextArea;
 
 public class InputTab extends GeneralTab {
 
@@ -31,6 +33,12 @@ public class InputTab extends GeneralTab {
   public static final String TAB_TOOLTIPS = "Specify fields to be fixed here.";
   private static final String DEFAULT_LABEL = "You haven't selected any input file or folder yet.";
   private static final String FILE_BUTTON_LABEL = "Select file";
+  // @formatter:off
+  private static final String INFO_TEXT = "What is this tool designed for?\n\n"
+            + "- It removes irregular namespaces produced by TopBraid, like j.0 and so on.\n"
+            + "- You can specifiy a single .rdf file or a whole folder as input and an output folder. \n"
+            + "Files will be added to the output folder and be specified by their input name.";
+  //@formatter:on
   private JLabel aktSelectionLabel;
   private JButton specifyFileBtn;
 
@@ -45,10 +53,21 @@ public class InputTab extends GeneralTab {
       initializeLabel = "Currently selected: " + currentSelection.getInputFile();
     }
     aktSelectionLabel = new JLabel(initializeLabel);
+    final Color textFieldColor = Color.BLUE;
+    aktSelectionLabel.setForeground(textFieldColor);
     super.components.add(aktSelectionLabel);
 
     specifyFileBtn = new JButton(FILE_BUTTON_LABEL);
     specifyFileBtn.addActionListener(new InputFileActionListener());
     super.components.add(specifyFileBtn);
+
+    /*
+     * information text area
+     */
+    final JTextArea infoArea = new JTextArea();
+    infoArea.setText(INFO_TEXT);
+    infoArea.setEditable(false);
+
+    super.components.add(infoArea);
   }
 }

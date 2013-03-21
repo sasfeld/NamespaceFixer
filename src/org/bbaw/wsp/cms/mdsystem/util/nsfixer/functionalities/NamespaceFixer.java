@@ -37,10 +37,14 @@ public class NamespaceFixer extends Observable {
    *          the input file.
    * @param outputFile
    *          the output file.
+   * @param forceOverride
+   *          if you want to force the override of the existing output file.
    * @throws InvalidSelectionException
    *           if the inputFile doesn't exist or the output file can't be written.
+   * @throws NeedToOverrideException
+   *           if the output file already exists. You can then choose to set the forceOption to true.
    */
-  public void fixFile(final File inputFile, final File outputFile) throws InvalidSelectionException {
+  public void fixFile(final File inputFile, final File outputFile, final boolean forceOverride) throws InvalidSelectionException, NeedToOverrideException {
     if (!inputFile.exists()) {
       throw new InvalidSelectionException("Please enter an existing file. Your input: " + inputFile.toString());
     }
@@ -56,7 +60,11 @@ public class NamespaceFixer extends Observable {
       final Scanner outputReader = new Scanner(new FileReader(inputFile));
       final String outputString = replaceInvalidNs(outputReader, invalidNamespaces);
 
-      writeOutputFile(outputFile, outputString);
+      if (!outputFile.exists() || forceOverride) { // true if the file doesn't exist or you force the override
+        writeOutputFile(outputFile, outputString);
+      } else {
+        throw new NeedToOverrideException("Override existing file " + outputFile.getAbsolutePath() + "?", "Override file", outputFile, inputFile, false);
+      }
 
       inputReader.close();
       outputReader.close();
@@ -215,12 +223,12 @@ public class NamespaceFixer extends Observable {
             outputDir.mkdir();
           }
           outputFile.createNewFile();
-          fixFile(child, outputFile);
+          fixFile(child, outputFile, true);
         } catch (final IOException e) {
           throw new InvalidSelectionException("Can't create file " + outputFile + "! You don't have the OS rights.");
         }
       } else {
-        throw new NeedToOverrideException("Override existing file " + outputFile.getAbsolutePath() + "?", "Override file", outputFile, child);
+        throw new NeedToOverrideException("Override existing file " + outputFile.getAbsolutePath() + "?", "Override file", outputFile, child, true);
       }
     }
   }

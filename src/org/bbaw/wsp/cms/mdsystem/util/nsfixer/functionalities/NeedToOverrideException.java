@@ -15,12 +15,28 @@ public class NeedToOverrideException extends Exception {
   private final String title;
   private final File outputFile;
   private final File inputFile;
+  private final boolean isDir;
 
-  public NeedToOverrideException(final String msg, final String title, final File outputFile, final File inputFile) {
+  /**
+   * This exception should be thrown if a file already exists and the user shall confirm in overriding it.
+   * 
+   * @param msg
+   *          String the message tho show
+   * @param title
+   *          String the title for the confirm dialog
+   * @param outputFile
+   *          {@link File} the selected output file (which already exists)
+   * @param inputFile
+   *          the current input file
+   * @param isDir
+   *          boolean true if the general surrounding input file was a directory
+   */
+  public NeedToOverrideException(final String msg, final String title, final File outputFile, final File inputFile, final boolean isDir) {
     super(msg);
     this.title = title;
     this.outputFile = outputFile;
     this.inputFile = inputFile;
+    this.isDir = isDir;
   }
 
   /**
@@ -43,6 +59,13 @@ public class NeedToOverrideException extends Exception {
    */
   public final File getOutputFile() {
     return outputFile;
+  }
+
+  /**
+   * @return the isDir
+   */
+  public final boolean isDir() {
+    return isDir;
   }
 
 }
