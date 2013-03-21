@@ -22,6 +22,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.mpg.mpiwg.berlin.mpdl.exception.ApplicationException;
+
 public class NamespaceFixer extends Observable {
   private final NamespacesStore namespacesStore;
   private File skipToFile;
@@ -66,12 +68,29 @@ public class NamespaceFixer extends Observable {
         throw new NeedToOverrideException("Override existing file " + outputFile.getAbsolutePath() + "?", "Override file", outputFile, inputFile, false);
       }
 
+      /*
+       * ------------------------ validate generated file. ------------------------
+       */
+      final boolean isValid = XmlValidator.isValid(outputFile.getAbsolutePath());
+      setChanged();
+      this.notifyObservers("... Checking xml validity of the generated file. ... ");
+      if (!isValid) {
+        throw new InvalidSelectionException("The generated file " + outputFile + " isn't xml valid. Please remove the (input) file and start fixing again.");
+      }
+      setChanged();
+      this.notifyObservers("... The generated file is xml valid! ... ");
+      /*
+       * --------------------------------------------------------------------------
+       */
+
       inputReader.close();
       outputReader.close();
       setChanged();
       this.notifyObservers("Fixed file " + inputFile);
     } catch (final FileNotFoundException e) {
       throw new InvalidSelectionException("Please enter an existing file. Your input: " + inputFile.toString());
+    } catch (final ApplicationException e) {
+      throw new InvalidSelectionException("The generated file " + outputFile + " isn't xml valid. Please remove the (input) file and start fixing again.");
     }
 
   }

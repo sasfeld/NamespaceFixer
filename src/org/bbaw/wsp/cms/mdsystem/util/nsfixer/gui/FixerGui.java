@@ -26,7 +26,7 @@ public class FixerGui extends JFrame {
    * Title of all error messages.
    */
   private static final String ERROR_TITLE = "Error";
-  private static final String GUI_TITLE = "NamespaceFixer Tool";
+  private static final String GUI_TITLE = "NamespaceFixer Tool V21_03_13";
   private static FixerGui instance;
   private FixTab fixerTab;
   private static SelectionRecord currentSelection;

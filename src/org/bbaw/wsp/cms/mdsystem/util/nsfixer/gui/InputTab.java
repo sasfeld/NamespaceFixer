@@ -37,7 +37,9 @@ public class InputTab extends GeneralTab {
   private static final String INFO_TEXT = "What is this tool designed for?\n\n"
             + "- It removes irregular namespaces produced by TopBraid, like j.0 and so on.\n"
             + "- You can specifiy a single .rdf file or a whole folder as input and an output folder. \n"
-            + "Files will be added to the output folder and be specified by their input name.";
+            + "Files will be added to the output folder and be specified by their input name.\n\n"
+            + "Each generated file will get checked for its XML validity.\n"
+            + "If one of the generated file isn't xml valid you have to check it yourself.";
   //@formatter:on
   private JLabel aktSelectionLabel;
   private JButton specifyFileBtn;
